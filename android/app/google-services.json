@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "619530952670",
+    "firebase_url": "https://fashtion2.firebaseio.com",
+    "project_id": "fashtion2",
+    "storage_bucket": "fashtion2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:619530952670:android:df36a995ceb4ab49",
+        "android_client_info": {
+          "package_name": "com.example.dummytask2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "619530952670-9frquf3p9l1849u5ubvboh1t8qajj10t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dummytask2",
+            "certificate_hash": "26c43b49eab5fb8fe85ae54a2f682eca15e29127"
+          }
+        },
+        {
+          "client_id": "619530952670-ro1d2qfr5rcugsgbg8q6rkoo1p08hiar.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNqqSlvxNQ-i46kHbSTBOXZtxF7eA8rsM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "619530952670-ro1d2qfr5rcugsgbg8q6rkoo1p08hiar.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
