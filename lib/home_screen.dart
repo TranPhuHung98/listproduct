@@ -34,7 +34,7 @@ class _HomeScreen extends State<HomeScreen> {
     _googleSignIn.signOut();
     Navigator
         .of(context)
-        .pushReplacement(MaterialPageRoute(builder: (_) => MyApp()));
+        .pushReplacement(MaterialPageRoute(builder: (_) => MyHomePage()));
   }
 
   _onAdminAdded(Event event) {
@@ -82,145 +82,160 @@ class _HomeScreen extends State<HomeScreen> {
       }
     }
 
-    Future<Map> _neverSatisfied(String _postKey) async {
-      return showDialog<Map>(
-        context: context,
-        barrierDismissible: false, // user must tap button!
-        builder: (BuildContext context) {
-          return new AlertDialog(
-            title: new Text('Bạn có chắc chắc xóa sản phẩm này?'),
-            actions: <Widget>[
-              FlatButton(
-                child: new Text('Xóa'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  FirebaseDatabase.instance
-                      .reference()
-                      .child("items/$_postKey")
-                      .remove();
-                },
+    Widget _drawer = Drawer(
+      child: ListView(
+        children: <Widget>[
+          UserAccountsDrawerHeader(
+            accountName: Text(widget.user.displayName),
+            accountEmail: Text(widget.user.email),
+            currentAccountPicture: CircleAvatar(
+              child: Image.network(widget.user.photoUrl),
+              radius: 60.0,
+            ),
+          ),
+          ListTile(
+            title: Text("Đăng xuất"),
+            onTap: _signOut,
+            trailing: Icon(Icons.rotate_right),
+          )
+        ],
+      ),
+    );
+
+    Widget _listProduct = Column(
+      children: <Widget>[
+        Expanded(
+            child: ListView.builder(
+          itemCount: leng,
+          itemBuilder: (BuildContext context, int index) {
+            return Dismissible(
+              key: Key(items[index].key),
+              onDismissed: (direction) {
+                if (admin)
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => DeleteItem(
+                            user: widget.user,
+                            keyProduct: items[leng - index - 1].key,
+                          )));
+              },
+              background: Container(
+                color: Colors.grey,
+                child: Center(
+                  child: Text(
+                    "Xóa",
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                ),
               ),
-            ],
-          );
-        },
-      );
+              child: Card(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Image.network(
+                      items[leng - index - 1].image,
+                      height: 150.0,
+                      width: 180.0,
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Text("Tên: ${items[leng-index-1].name}",
+                            style: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.bold)),
+                        Container(
+                          padding: EdgeInsets.only(bottom: 40.0),
+                          child:
+                              Text("Số lượng: ${items[leng-index-1].number}"),
+                        ),
+                        FlatButton(
+                          color: Colors.grey[300],
+                          child: Text("Chỉnh sửa số lượng",
+                              style: TextStyle(
+                                color: Colors.blue,
+                              )),
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => EditProductCount(
+                                      keyProduct: items[leng - index - 1].key,
+                                      number: items[leng - index - 1].number,
+                                      user: widget.user,
+                                      name: items[leng - index - 1].name,
+                                      historyProduct:
+                                          items[leng - index - 1].image,
+                                      image: items[leng - index - 1].image,
+                                    )));
+                          },
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ))
+      ],
+    );
+
+    Widget _addProduct = FloatingActionButton(
+      child: Icon(Icons.add),
+      onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => addItemScreen(
+                user: widget.user,
+              ))),
+    );
+
+    Future<bool> _onBackPressed() {
+      return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text("Bạn có muốn thoát ứng dụng này?"),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text("Không"),
+                    onPressed: () => Navigator.pop(context, false),
+                  ),
+                  FlatButton(
+                    child: Text("Có"),
+                    onPressed: () => Navigator.pop(context, true),
+                  ),
+                ],
+              ));
     }
 
     return MaterialApp(
-        home: Scaffold(
-            appBar: AppBar(),
-            drawer: Drawer(
-              child: ListView(
-                children: <Widget>[
-                  UserAccountsDrawerHeader(
-                    accountName: Text(widget.user.displayName),
-                    accountEmail: Text(widget.user.email),
-                    currentAccountPicture: CircleAvatar(
-                      child: Image.network(widget.user.photoUrl),
-                      radius: 60.0,
-                    ),
-                  ),
-                  ListTile(
-                    title: Text("Đăng xuất"),
-                    onTap: _signOut,
-                    trailing: Icon(Icons.rotate_right),
-                  )
-                ],
-              ),
-            ),
-            floatingActionButton: admin == false
-                ? null
-                : FloatingActionButton(
-                    child: Icon(Icons.add),
-                    onPressed: () =>
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => addItemScreen(
-                                  user: widget.user,
-                                ))),
-                  ),
-            body: Column(
-              children: <Widget>[
-                Expanded(
-                    child: ListView.builder(
-                  itemCount: leng,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Dismissible(
-                      key: Key(items[index].key),
-                      onDismissed: (direction) {
-                        if (admin)
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (_) => DeleteItem(
-                                    user: widget.user,
-                                    keyProduct: items[leng - index - 1].key,
-                                  )));
-                      },
-                      background: Container(
-                        color: Colors.grey,
-                        child: Center(
-                          child: Text(
-                            "Xóa",
-                            style: TextStyle(fontSize: 18.0),
-                          ),
-                        ),
-                      ),
-                      child: Card(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Image.network(
-                              items[leng - index - 1].image,
-                              height: 150.0,
-                              width: 180.0,
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                Text("Tên: ${items[leng-index-1].name}",
-                                    style: TextStyle(
-                                        fontSize: 20.0,
-                                        fontWeight: FontWeight.bold)),
-                                Container(
-                                  padding: EdgeInsets.only(bottom: 40.0),
-                                  child: Text(
-                                      "Số lượng: ${items[leng-index-1].number}"),
-                                ),
-                                FlatButton(
-                                  color: Colors.grey[300],
-                                  child: Text("Chỉnh sửa số lượng",
-                                      style: TextStyle(
-                                        color: Colors.blue,
-                                      )),
-                                  onPressed: () {
-                                    Navigator
-                                        .of(context)
-                                        .push(MaterialPageRoute(
-                                            builder: (_) => EditProductCount(
-                                                  keyProduct:
-                                                      items[leng - index - 1]
-                                                          .key,
-                                                  number:
-                                                      items[leng - index - 1]
-                                                          .number,
-                                                  user: widget.user,
-                                                  name: items[leng - index - 1]
-                                                      .name,
-                                                  historyProduct:
-                                                      items[leng - index - 1]
-                                                          .image,
-                                                  image: items[leng - index - 1]
-                                                      .image,
-                                                )));
-                                  },
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ))
-              ],
-            )));
+        home: WillPopScope(
+      onWillPop: _onBackPressed,
+      child: Scaffold(
+        appBar: AppBar(),
+        drawer: _drawer,
+        floatingActionButton: admin == false ? null : _addProduct,
+        body: _listProduct,
+      ),
+    ));
   }
 }
+
+// Future<Map> _neverSatisfied(String _postKey) async {
+//       return showDialog<Map>(
+//         context: context,
+//         barrierDismissible: false, // user must tap button!
+//         builder: (BuildContext context) {
+//           return new AlertDialog(
+//             title: new Text('Bạn có chắc chắc xóa sản phẩm này?'),
+//             actions: <Widget>[
+//               FlatButton(
+//                 child: new Text('Xóa'),
+//                 onPressed: () {
+//                   Navigator.of(context).pop();
+//                   FirebaseDatabase.instance
+//                       .reference()
+//                       .child("items/$_postKey")
+//                       .remove();
+//                 },
+//               ),
+//             ],
+//           );
+//         },
+//       );
+//     }

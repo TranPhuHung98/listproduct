@@ -148,7 +148,7 @@ class _EditProductCountState extends State<EditProductCount> {
               height: 50.0,
               child: FlatButton(
                 color: Colors.red[200],
-                child: Text("Edit"),
+                child: Text("Submit"),
                 onPressed: () {
                   FirebaseDatabase.instance
                       .reference()

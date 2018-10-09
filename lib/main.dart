@@ -22,33 +22,33 @@ Future<Null> _configure() async {
 
 void main() {
   AppBloC appBloC = AppBloC();
-  runApp(new MyApp(
+  runApp(new MaterialApp(home:MyHomePage(
     appBloc: appBloC,
-  ));
+  )));
   // runApp(HomeScreen());
 }
 
-class MyApp extends StatelessWidget {
-  final AppBloC appBloc;
-  bool _isLogged = false;
-  StreamSubscription<AppState> userSubcription;
-  MyApp({Key key, this.appBloc}) : super(key: key);
+// class MyApp extends StatelessWidget {
+//   final AppBloC appBloc;
+//   bool _isLogged = false;
+//   StreamSubscription<AppState> userSubcription;
+//   MyApp({Key key, this.appBloc}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      // home: SplashScreen(appBloc: appBloc,),
-      home: MyHomePage(
-        appBloc: appBloc,
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//       ),
+//       // home: SplashScreen(appBloc: appBloc,),
+//       home: MyHomePage(
+//         appBloc: appBloc,
+//       ),
+//     );
+//   }
+// }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatefulWidget  {
   final AppBloC appBloc;
   MyHomePage({Key key, this.title, this.appBloc}) : super(key: key);
 
@@ -58,10 +58,11 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => new _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   bool loading = true;
+  AnimationController _animationController;
 
   Future<FirebaseUser> _handleSignIn() async {
     GoogleSignInAccount googleUser = await _googleSignIn.signIn();
@@ -73,9 +74,6 @@ class _MyHomePageState extends State<MyHomePage> {
     print("signed in " + user.displayName);
     Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => HomeScreen(user: user)));
-    // bool isLoading = true;int check =1;
-    // widget.appBloc.saveLogged(isLoading,check);
-    // widget.appBloc.updateUser(AppState(isLoading));
     return user;
   }
 
@@ -89,7 +87,22 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+    void initState() {
+      super.initState();
+      _animationController = AnimationController(duration: Duration(seconds: 10),vsync: this)..repeat();
+  }
+
+  @override
+    void dispose() {
+      super.dispose();
+      _animationController.dispose();
+    }
+
+
+
+  @override
   Widget build(BuildContext context) {
+    
     return new Scaffold(
         body: new Center(
       child: loading == false
